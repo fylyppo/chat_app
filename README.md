@@ -1,6 +1,6 @@
 # chat_app
 
-A new Flutter project.
+An application that allows group chat.
 
 ## Getting Started
 
