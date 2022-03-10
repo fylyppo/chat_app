@@ -10,18 +10,7 @@ class MessagesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Messages App')),
-      drawer: Drawer(
-        child: SafeArea(
-          child: Column(
-            children: [
-              TextButton.icon(onPressed: (){
-                FirebaseAuth.instance.signOut();
-              }, icon: Icon(Icons.logout), label: Text('Logout'))
-            ],
-          ),
-        ),
-      ),
+      appBar: AppBar(title: Text('Main Group')),
       body: Column(children: [
         Expanded(child: MessagesWidget()),
         NewMessageWidget(),
