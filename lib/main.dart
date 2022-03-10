@@ -1,9 +1,14 @@
+import 'package:chat_app/providers/search_provider.dart';
+import 'package:chat_app/providers/users_provider.dart';
 import 'package:chat_app/screens/auth_page.dart';
+import 'package:chat_app/screens/chats_page.dart';
+import 'package:chat_app/screens/create_group_page.dart';
 import 'package:chat_app/screens/messages_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,23 +18,37 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
-  
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Messages App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, userSnapshot) {
-        if(userSnapshot.hasData){
-          return MessagesPage();
-        } else {
-          return AuthPage();
-        }
-      },)
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => Search(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => Users(),
+        ),
+      ],
+      child: MaterialApp(
+          title: 'Messages App',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          routes: {
+            '/mainGroup': (context) => MessagesPage(),
+            '/createGroup': (context) => CreateGroupPage(),
+          },
+          home: StreamBuilder(
+            stream: FirebaseAuth.instance.authStateChanges(),
+            builder: (context, userSnapshot) {
+              if (userSnapshot.hasData) {
+                return ChatsPage();
+              } else {
+                return AuthPage();
+              }
+            },
+          )),
     );
   }
 }
