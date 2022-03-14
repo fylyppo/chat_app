@@ -1,3 +1,4 @@
+import 'package:chat_app/providers/members_provider.dart';
 import 'package:chat_app/providers/search_provider.dart';
 import 'package:chat_app/providers/users_provider.dart';
 import 'package:chat_app/screens/auth_page.dart';
@@ -24,9 +25,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Search(),
-        ),
-        ChangeNotifierProvider(
           create: (context) => Users(),
         ),
       ],
@@ -36,14 +34,24 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           routes: {
-            '/mainGroup': (context) => const MessagesPage(),
-            '/createGroup': (context) => CreateGroupPage(),
+            '/mainGroup': (context) => MessagesPage(),
+            '/createGroup': (context) => MultiProvider(
+                  providers: [
+                    ChangeNotifierProvider(
+                        create: (context) => Members(context)),
+                    ChangeNotifierProvider(create: (context) => Users())
+                  ],
+                  child: const CreateGroupPage(),
+                ),
           },
           home: StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, userSnapshot) {
               if (userSnapshot.hasData) {
-                return const ChatsPage();
+                return ChangeNotifierProvider(
+                  create: (context) => Search(),
+                  child: const ChatsPage(),
+                );
               } else {
                 return ChangeNotifierProvider(
                   create: (context) => Auth(),

@@ -1,3 +1,4 @@
+import 'package:chat_app/providers/users_provider.dart';
 import 'package:chat_app/widgets/search_list_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,10 @@ class ChatsPage extends StatelessWidget {
           const SearchBarWidget(),
           Consumer<Search>(
             builder: (context, _search, _) => _search.searchedText != ''
-                ? const SearchListWidget()
+                ? ChangeNotifierProvider(
+                    create: (context) => Users(),
+                    child: SearchListWidget(),
+                  )
                 : SliverList(
                     delegate: SliverChildListDelegate([
                       Padding(
@@ -68,7 +72,8 @@ class ChatsPage extends StatelessWidget {
                                 ),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.start,
                                   children: const [
                                     Text(
                                       'Main Group',
