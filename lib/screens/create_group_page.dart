@@ -21,14 +21,15 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   final List<String> _members = [];
 
   final _userId = FirebaseAuth.instance.currentUser!.uid;
+  final _userName = FirebaseAuth.instance.currentUser!.displayName;
   Future<void> _createGroup() async {
     FirebaseFirestore.instance.collection('groups').add({
       'createdAt': Timestamp.now(),
       'createdBy': _userId,
-      'members': Provider.of<Members>(context, listen: false).membersList,
+      'members': Provider.of<Members>(context, listen: false).membersIdsList,
       'modifiedAt': Timestamp.now(),
       'groupName': _nameController.text,
-      'recentMessage': {},
+      'recentMessage': {'username': _userName, 'text': 'Created a group.'},
       'type': 2,
     });
   }
