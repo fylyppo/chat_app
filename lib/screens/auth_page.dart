@@ -1,105 +1,20 @@
 import 'dart:io';
 
+import 'package:chat_app/providers/auth_provider.dart';
 import 'package:chat_app/widgets/pickers/user_image_picker_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
-class AuthPage extends StatefulWidget {
+class AuthPage extends StatelessWidget {
   const AuthPage({Key? key}) : super(key: key);
 
   @override
-  State<AuthPage> createState() => _AuthPageState();
-}
-
-class _AuthPageState extends State<AuthPage> {
-  final _formKey = GlobalKey<FormState>();
-  final TextEditingController _pass = TextEditingController();
-  final TextEditingController _confirmPass = TextEditingController();
-
-  var isLogin = true;
-
-  var _userEmail = '';
-
-  var _userName = '';
-
-  var _userPassword = '';
-
-  File? _userImageFile;
-
-  void _pickedImage(File file) {
-    _userImageFile = file;
-  }
-
-  void _trySubmit() {
-    final isValid = _formKey.currentState!.validate();
-    FocusScope.of(context).unfocus();
-
-    if (_userImageFile == null && !isLogin) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Pick a profile image.')));
-      return;
-    }
-    if (isValid) {
-      _formKey.currentState!.save();
-      _submitAuthForm();
-    }
-  }
-
-  bool isLoading = false;
-
-  Future<void> _submitAuthForm() async {
-    final _auth = FirebaseAuth.instance;
-    UserCredential _userCredential;
-
-    try {
-      setState(() {
-        isLoading = true;
-      });
-      if (isLogin) {
-        _userCredential = await _auth.signInWithEmailAndPassword(
-            email: _userEmail, password: _userPassword);
-      } else {
-        _userCredential = await _auth.createUserWithEmailAndPassword(
-            email: _userEmail, password: _userPassword);
-
-        final ref = FirebaseStorage.instance
-            .ref()
-            .child(_userCredential.user!.uid)
-            .child('avatar');
-        await ref.putFile(_userImageFile!);
-        final _avatarUrl = await ref.getDownloadURL();
-
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(_userCredential.user!.uid)
-            .set({
-          'username': _userName,
-          'email': _userEmail,
-        });
-      }
-    } on PlatformException catch (e) {
-      var message = 'An error occurred, please check your credentials!';
-      if (e.message != null) {
-        message = e.message!;
-      }
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(message)));
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final auth = Provider.of<Auth>(context);
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -109,14 +24,14 @@ class _AuthPageState extends State<AuthPage> {
               children: [
                 Text('Messages App'),
                 Form(
-                    key: _formKey,
+                    key: auth.formkey,
                     child: Column(
                       children: [
                         SizedBox(
                           height: 40,
                         ),
-                        if (!isLogin)
-                          UserImagePickerWidget(pickProfileImage: _pickedImage),
+                        if (!auth.isLogin)
+                          UserImagePickerWidget(pickProfileImage: auth.pickedImage),
                         TextFormField(
                           key: ValueKey('email'),
                           initialValue: '',
@@ -130,13 +45,13 @@ class _AuthPageState extends State<AuthPage> {
                             return null;
                           },
                           onSaved: (value) {
-                            _userEmail = value!;
+                            auth.userEmail = value!;
                           },
                         ),
-                        if (!isLogin)
+                        if (!auth.isLogin)
                           TextFormField(
-                            key: ValueKey('username'),
-                            decoration: InputDecoration(hintText: 'Username'),
+                            key: const ValueKey('username'),
+                            decoration: const InputDecoration(hintText: 'Username'),
                             validator: (value) {
                               if (value!.isEmpty || value.length < 4) {
                                 return 'Please enter at least 4 characters';
@@ -144,11 +59,11 @@ class _AuthPageState extends State<AuthPage> {
                               return null;
                             },
                             onSaved: (value) {
-                              _userName = value!;
+                              auth.userName = value!;
                             },
                           ),
                         TextFormField(
-                          controller: _pass,
+                          controller: auth.pass,
                           key: ValueKey('password'),
                           decoration: InputDecoration(hintText: 'Password'),
                           obscureText: true,
@@ -159,42 +74,38 @@ class _AuthPageState extends State<AuthPage> {
                             return null;
                           },
                           onSaved: (value) {
-                            _userPassword = value!;
+                            auth.userPassword = value!;
                           },
                         ),
-                        if (!isLogin)
+                        if (!auth.isLogin)
                           TextFormField(
-                            controller: _confirmPass,
+                            controller: auth.confirmPass,
                             key: ValueKey('repeatPassword'),
                             decoration:
                                 InputDecoration(hintText: 'Repeat password'),
                             obscureText: true,
                             validator: (value) {
-                              print(value);
-                              print(_userPassword);
                               if (value!.isEmpty) {
                                 return 'Password must be at least 7 characters long.';
                               }
-                              if (value != _pass.text)
+                              if (value != auth.pass.text)
                                 return 'Passwords does not match.';
                               return null;
                             },
                           ),
-                        isLoading
-                            ? Center(
+                        auth.isLoading
+                            ? const Center(
                                 child: CircularProgressIndicator(),
                               )
                             : TextButton.icon(
-                                onPressed: _trySubmit,
+                                onPressed: () => auth.trySubmit(context),
                                 icon: Icon(Icons.login),
-                                label: Text(isLogin ? 'Login' : 'Register')),
+                                label: Text(auth.isLogin ? 'Login' : 'Register')),
                         TextButton(
                             onPressed: () {
-                              setState(() {
-                                isLogin = !isLogin;
-                              });
+                                auth.isLogin = !auth.isLogin;
                             },
-                            child: Text(isLogin ? 'Sign Up' : 'Sign In')),
+                            child: Text(auth.isLogin ? 'Sign Up' : 'Sign In')),
                       ],
                     ))
               ],
