@@ -4,12 +4,12 @@ import 'package:chat_app/screens/auth_page.dart';
 import 'package:chat_app/screens/chats_page.dart';
 import 'package:chat_app/screens/create_group_page.dart';
 import 'package:chat_app/screens/messages_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -24,9 +24,6 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => Auth(),
-        ),
-        ChangeNotifierProvider(
           create: (context) => Search(),
         ),
         ChangeNotifierProvider(
@@ -39,16 +36,19 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           routes: {
-            '/mainGroup': (context) => MessagesPage(),
+            '/mainGroup': (context) => const MessagesPage(),
             '/createGroup': (context) => CreateGroupPage(),
           },
           home: StreamBuilder(
             stream: FirebaseAuth.instance.authStateChanges(),
             builder: (context, userSnapshot) {
               if (userSnapshot.hasData) {
-                return ChatsPage();
+                return const ChatsPage();
               } else {
-                return AuthPage();
+                return ChangeNotifierProvider(
+                  create: (context) => Auth(),
+                  child: const AuthPage(),
+                );
               }
             },
           )),

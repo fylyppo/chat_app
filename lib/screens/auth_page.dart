@@ -1,12 +1,6 @@
-import 'dart:io';
-
 import 'package:chat_app/providers/auth_provider.dart';
 import 'package:chat_app/widgets/pickers/user_image_picker_widget.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class AuthPage extends StatelessWidget {
@@ -22,7 +16,7 @@ class AuthPage extends StatelessWidget {
             padding: const EdgeInsets.all(20.0),
             child: Column(
               children: [
-                Text('Messages App'),
+                const Text('Messages App'),
                 Form(
                     key: auth.formkey,
                     child: Column(

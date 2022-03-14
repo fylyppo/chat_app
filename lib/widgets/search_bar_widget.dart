@@ -37,7 +37,7 @@ class _SearchBarWidgetState extends State<SearchBarWidget> {
                     label: const Text('Search for a user'),
                     labelStyle: const TextStyle(color: Colors.white),
                     hintText: 'Search by username...',
-                    hintStyle: TextStyle(color: Colors.grey[700])),
+                    hintStyle: TextStyle(color: Colors.grey[300])),
                 cursorColor: Colors.white,
                 style: const TextStyle(color: Colors.white),
               ),
