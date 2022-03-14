@@ -41,6 +41,7 @@ dependencies:
   firebase_storage: ^10.2.9
   firebase_image: ^1.1.1
   provider: ^6.0.2
+  timeago: ^3.2.2
 
 dev_dependencies:
   flutter_test:

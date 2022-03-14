@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
               if (userSnapshot.hasData) {
                 return ChangeNotifierProvider(
                   create: (context) => Search(),
-                  child: const ChatsPage(),
+                  child: ChatsPage(),
                 );
               } else {
                 return ChangeNotifierProvider(
