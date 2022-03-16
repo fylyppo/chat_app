@@ -1,10 +1,12 @@
 import 'package:chat_app/providers/users_provider.dart';
+import 'package:chat_app/screens/chat_page.dart';
 import 'package:chat_app/widgets/search_list_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import '../providers/chat_provider.dart';
 import '../providers/search_provider.dart';
 import '../widgets/search_bar_widget.dart';
 
@@ -12,7 +14,14 @@ class ChatsPage extends StatelessWidget {
   ChatsPage({Key? key}) : super(key: key);
 
   final _userId = FirebaseAuth.instance.currentUser!.uid;
-  
+
+  void _navigateToChat({required BuildContext context, required String chatId, required String groupName,}) {
+    Navigator.push(context,MaterialPageRoute(builder: (context) => ChangeNotifierProvider(
+      create: (context) => Chat(chatId: chatId, groupName: groupName),
+        child: ChatPage(),
+    )),);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,8 +63,7 @@ class ChatsPage extends StatelessWidget {
                   : StreamBuilder(
                       stream: FirebaseFirestore.instance
                           .collection('groups')
-                          .where(('members'),
-                              arrayContains: _userId)
+                          .where(('members'), arrayContains: _userId)
                           .orderBy('modifiedAt', descending: true)
                           .snapshots(),
                       builder: (context,
@@ -78,22 +86,24 @@ class ChatsPage extends StatelessWidget {
                                 color: Colors.white,
                               )));
                         }
-                        if (_chatDocs.isEmpty){
+                        if (_chatDocs.isEmpty) {
                           return const SliverAppBar(
                               automaticallyImplyLeading: false,
                               backgroundColor: Colors.white,
                               title: Center(
-                                  child: Text('No messages yet.', style: TextStyle(color: Colors.black),)));
+                                  child: Text(
+                                'No messages yet.',
+                                style: TextStyle(color: Colors.black),
+                              )));
                         }
                         return SliverList(
                           delegate:
                               SliverChildBuilderDelegate((context, index) {
+                            final bool _isSeen = _chatDocs[index]['lastSeenMessage'][_userId] != _chatDocs[index]['recentMessage']['id'];
                             return Padding(
                               padding: const EdgeInsets.fromLTRB(8.0, 8, 8, 0),
                               child: InkWell(
-                                onTap: () {
-                                  Navigator.pushNamed(context, '/mainGroup');
-                                },
+                                onTap: () => _navigateToChat(context: context, chatId: _chatDocs[index].id, groupName: _chatDocs[index]['groupName']),
                                 child: Container(
                                   height: 75,
                                   decoration: BoxDecoration(
@@ -117,9 +127,9 @@ class ChatsPage extends StatelessWidget {
                                           children: [
                                             Text(
                                               _chatDocs[index]['groupName'],
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                   fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
+                                                  fontWeight: _isSeen ? FontWeight.bold : FontWeight.normal),
                                             ),
                                             Text(
                                               _chatDocs[index]['recentMessage']
@@ -127,7 +137,7 @@ class ChatsPage extends StatelessWidget {
                                                   ': ' +
                                                   _chatDocs[index]
                                                       ['recentMessage']['text'],
-                                              style: TextStyle(fontSize: 14),
+                                              style: TextStyle(fontSize: 14, fontWeight: _isSeen ? FontWeight.bold : FontWeight.normal),
                                             ),
                                           ],
                                         ),
@@ -142,7 +152,7 @@ class ChatsPage extends StatelessWidget {
                                                             ['modifiedAt']
                                                         .microsecondsSinceEpoch)),
                                             style: TextStyle(
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: _isSeen ? FontWeight.bold : FontWeight.normal,
                                             )),
                                       )
                                     ],

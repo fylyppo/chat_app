@@ -10,6 +10,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'providers/chat_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,6 @@ class MyApp extends StatelessWidget {
             primarySwatch: Colors.blue,
           ),
           routes: {
-            '/chat': (context) => ChatPage(),
             '/createGroup': (context) => MultiProvider(
                   providers: [
                     ChangeNotifierProvider(
