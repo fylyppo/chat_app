@@ -18,8 +18,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
 
   final _nameController = TextEditingController();
 
-  final List<String> _members = [];
-
   final _userId = FirebaseAuth.instance.currentUser!.uid;
   final _userName = FirebaseAuth.instance.currentUser!.displayName;
   Future<void> _createGroup() async {
@@ -29,7 +27,8 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
       'members': Provider.of<Members>(context, listen: false).membersIdsList,
       'modifiedAt': Timestamp.now(),
       'groupName': _nameController.text,
-      'recentMessage': {'username': _userName, 'text': 'Created a group.'},
+      'recentMessage': {'id': null, 'username': _userName, 'text': 'Created a group.'},
+      'lastSeenMessage': {},
       'type': 2,
     });
   }
@@ -41,13 +40,13 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text('Create a group'),
+        title: const Text('Create a group'),
         actions: [
           IconButton(
             onPressed: () {
               _createGroup();
             },
-            icon: Icon(Icons.mark_chat_read_outlined),
+            icon: const Icon(Icons.mark_chat_read_outlined),
             tooltip: 'Create a group',
           )
         ],
@@ -60,7 +59,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             child: Container(
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
                     colors: [

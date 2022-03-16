@@ -3,7 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class NewMessageWidget extends StatefulWidget {
-  NewMessageWidget({Key? key}) : super(key: key);
+  NewMessageWidget({
+    Key? key,
+    required this.chatId,
+  }) : super(key: key);
+
+  final String chatId;
 
   @override
   State<NewMessageWidget> createState() => _NewMessageWidgetState();
@@ -12,16 +17,23 @@ class NewMessageWidget extends StatefulWidget {
 class _NewMessageWidgetState extends State<NewMessageWidget> {
   var _message = '';
   final _controller = TextEditingController();
-  
 
   void _sendMessage() async {
     final _userId = FirebaseAuth.instance.currentUser!.uid;
-    final _userData = await FirebaseFirestore.instance.collection('users').doc(_userId).get();
-    FirebaseFirestore.instance.collection('chat').add({
-      'text' : _message,
-      'createdAt' : Timestamp.now(),
-      'userId' : _userId,
-      'username' : _userData['username'],
+    final _userName = FirebaseAuth.instance.currentUser!.displayName;
+    final _messageData = await FirebaseFirestore.instance
+        .collection('messages')
+        .doc(widget.chatId)
+        .collection('groupMessages')
+        .add({
+      'text': _message,
+      'createdAt': Timestamp.now(),
+      'userId': _userId,
+      'username': _userName,
+    });
+    await FirebaseFirestore.instance.collection('groups').doc(widget.chatId).update({
+      'recentMessage': {'id': _messageData.id, 'text': _message, 'username': _userName},
+      'modifiedAt': Timestamp.now()
     });
     _controller.clear();
   }
