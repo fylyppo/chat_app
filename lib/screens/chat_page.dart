@@ -1,4 +1,5 @@
 import 'package:chat_app/providers/chat_provider.dart';
+import 'package:chat_app/providers/messages_provider.dart';
 import 'package:chat_app/widgets/chat/messages_widget.dart';
 import 'package:chat_app/widgets/chat/new_message_widget.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,11 @@ class ChatPage extends StatelessWidget {
       builder: ((context, _chat, _) => Scaffold(
         appBar: AppBar(title: Text(_chat.groupName)),
         body: Column(children: [
-          Expanded(child: MessagesWidget(chatId: _chat.chatId,)),
+          Expanded(child: ChangeNotifierProvider(
+            create: (context) => Messages(),
+            child: MessagesWidget(chatId: _chat.chatId,)
+            )
+            ),
           NewMessageWidget(chatId: _chat.chatId,),
         ],
         )
