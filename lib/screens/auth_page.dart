@@ -3,9 +3,14 @@ import 'package:chat_app/widgets/pickers/user_image_picker_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class AuthPage extends StatelessWidget {
+class AuthPage extends StatefulWidget {
   const AuthPage({Key? key}) : super(key: key);
 
+  @override
+  State<AuthPage> createState() => _AuthPageState();
+}
+
+class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     final auth = Provider.of<Auth>(context);
@@ -97,7 +102,10 @@ class AuthPage extends StatelessWidget {
                                 label: Text(auth.isLogin ? 'Login' : 'Register')),
                         TextButton(
                             onPressed: () {
-                                auth.isLogin = !auth.isLogin;
+                                setState(() {
+                                  auth.isLogin = !auth.isLogin;
+                                });
+                                
                             },
                             child: Text(auth.isLogin ? 'Sign Up' : 'Sign In')),
                       ],
