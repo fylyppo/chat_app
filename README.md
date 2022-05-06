@@ -1,16 +1,7 @@
 # chat_app
 
-An application that allows group chat.
+A chat_app project created in Flutter using Provider and CloudFirestore. It supports mobile and it's almost fully working (the exception is the lack of selection of a group photo).
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The chat_app allows user to create group chats, send and read messages within the group. After you sign up with avatar, email address, username and password you will be able to create a group with group name and other users which you can add by searching them by username. Then you are good to go! You can messaging with other group members and seeing who has seen which message.
